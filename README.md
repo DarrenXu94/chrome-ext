@@ -1,0 +1,1 @@
+A chrome extension to stop damn spoilers on my youtube feed
