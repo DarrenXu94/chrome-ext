@@ -14,10 +14,14 @@ const handleVideoRenderer = (videoRenderer) => {
   }
 
   // check if the title contains a score
-  const title = videoRenderer.querySelector("#video-title-link").textContent;
+  const title = videoRenderer.querySelector("#video-title");
 
-  if (scoreRegex.test(title)) {
-    const titleElement = videoRenderer.querySelector("#video-title-link");
+  if (!title) return;
+
+  const titleTextContent = title.textContent;
+
+  if (scoreRegex.test(titleTextContent)) {
+    const titleElement = videoRenderer.querySelector("#video-title");
     const newTitle = titleElement.textContent.replace(scoreRegex, "X - X");
     titleElement.textContent = newTitle;
   }
@@ -43,13 +47,10 @@ const handleRichGridMedia = (gridMedia) => {
 };
 
 function run() {
-  console.log("RUNNING CONTENT SCRIPT");
-
+  console.log("Script running");
   const thumbnails = document.querySelectorAll("ytd-thumbnail");
 
   for (let i = 0; i < thumbnails.length; i++) {
-    // find closest ytd-rich-grid-media or ytd-video-renderer
-
     const gridMedia = thumbnails[i].closest("ytd-rich-grid-media");
 
     if (gridMedia) {
@@ -64,18 +65,29 @@ function run() {
   }
 }
 
-window.onload = run;
-window.addEventListener("yt-navigate-start", run, true);
+// window.onload = run;
+// window.addEventListener("yt-navigate-start", run, true);
+
+function debounce(func, timeout = 300) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(this, args);
+    }, timeout);
+  };
+}
 
 const targetNode = document.querySelector("#contents"); // Element containing the suggested videos
 const config = { childList: true, subtree: true };
+
+const debouncedRun = debounce(() => run(), 500);
 
 const callback = function (mutationsList, observer) {
   for (let mutation of mutationsList) {
     if (mutation.type === "childList") {
       // console.log("New video suggestions detected!");
-      // Add your logic to handle new suggestions here
-      run();
+      debouncedRun();
     }
   }
 };
