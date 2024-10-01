@@ -1,4 +1,5 @@
-const spoilerChannels = ["Serie A", "NFL", "LALIGA"];
+// const spoilerChannels = ["Serie A", "NFL", "LALIGA"];
+const spoilerChannels = [];
 
 const scoreRegex = /\d{1,2}\s*-\s*\d{1,2}/; // Any string that is a score eg 0 - 1
 
@@ -32,6 +33,7 @@ const handleRichGridMedia = (gridMedia) => {
   const channelName = gridMedia.querySelector(".ytd-channel-name").textContent;
 
   // if channel name includes any string from spoilerChannels array hide the thumbnail
+  console.log("spiler channels", spoilerChannels);
   if (spoilerChannels.some((channel) => channelName.includes(channel))) {
     const coreImage = gridMedia.querySelector("img.yt-core-image");
     coreImage.style.display = "none";
@@ -46,8 +48,18 @@ const handleRichGridMedia = (gridMedia) => {
   }
 };
 
+chrome.runtime.sendMessage({ action: "getStrings" }, function (response) {
+  if (response && response.strings) {
+    // Do something with the strings in the content script
+    response.strings.forEach((string) => {
+      spoilerChannels.push(string);
+    });
+  }
+});
+
 function run() {
   console.log("Script running");
+
   const thumbnails = document.querySelectorAll("ytd-thumbnail");
 
   for (let i = 0; i < thumbnails.length; i++) {
