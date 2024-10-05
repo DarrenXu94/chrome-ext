@@ -33,14 +33,19 @@ const handleRichGridMedia = (gridMedia) => {
   const channelName = gridMedia.querySelector(".ytd-channel-name").textContent;
 
   // if channel name includes any string from spoilerChannels array hide the thumbnail
-  console.log("spiler channels", spoilerChannels);
   if (spoilerChannels.some((channel) => channelName.includes(channel))) {
     const coreImage = gridMedia.querySelector("img.yt-core-image");
     coreImage.style.display = "none";
-
-    // check if the title contains a score
   }
+
   const title = gridMedia.querySelector("#video-title-link").textContent;
+  // check if the title contains 'highlights'
+  if (title.toLowerCase().includes("highlights")) {
+    const coreImage = gridMedia.querySelector("img.yt-core-image");
+    coreImage.style.display = "none";
+  }
+
+  // check if the title contains a score
   if (scoreRegex.test(title)) {
     const titleElement = gridMedia.querySelector("#video-title-link");
     const newTitle = titleElement.textContent.replace(scoreRegex, "X - X");
